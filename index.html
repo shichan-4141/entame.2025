@@ -31,9 +31,12 @@
     .tab-content.active {
       display: block;
     }
-    input {
+    input, textarea {
       display: block;
       margin: 8px 0;
+      width: 100%;
+      max-width: 400px;
+      padding: 5px;
     }
   </style>
 </head>
@@ -44,9 +47,11 @@
     <button class="tab-button" onclick="showTab(1)">ログイン📁</button>
     <button class="tab-button" id="tab3Button" onclick="showTab(2)" style="display:none;">管理者専用タブ🗂</button>
     <button class="tab-button" onclick="showTab(3)">利用規約</button>
+    <button class="tab-button" onclick="showTab(4)">お問い合わせ📨</button>
+    <button class="tab-button" id="contactCheckTab" onclick="showTab(5)" style="display:none;">お問い合わせ確認📋</button>
   </div>
 
-  <!-- タブ1: ホーム -->
+  <!-- タブ0: ホーム -->
   <div class="tab-content active">
     <h1 style="color: Blue;">👦エンタメ👀</h1>
     <h3>〜エンタメの公式サイトです〜</h3>
@@ -56,9 +61,8 @@
     <p><small>© 2025 エンタメ®️</small></p>
   </div>
 
-  <!-- タブ2: マイページ -->
+  <!-- タブ1: マイページ -->
   <div class="tab-content" id="mypageTab">
-    <!-- ログインフォーム -->
     <div id="loginForm">
       <h2>🔐 ログイン</h2>
       <input type="text" id="loginId" placeholder="ログインID">
@@ -66,8 +70,6 @@
       <button onclick="login()">ログイン</button>
       <p id="loginError" style="color:red;"></p>
     </div>
-
-    <!-- ログイン後表示 -->
     <div id="adminContent" style="display:none;">
       <h2>👑 管理者ページ</h2>
       <p id="adminMessage"></p>
@@ -75,40 +77,46 @@
     </div>
   </div>
 
-  <!-- タブ3: 管理者専用 -->
+  <!-- タブ2: 管理者専用 -->
   <div class="tab-content">
     <h2>🗂 管理者専用コンテンツ</h2>
     <p>これは僕たち、ログインIDを持っている人だけが見れます！</p>
     <h3>管理者専用日記</h3>
-    <p>2025.6.5今日はこのページの開設日です！</p>
+    <p>2025.6.5 今日はこのページの開設日です！</p>
   </div>
 
-  <!-- タブ4: プライバシーポリシー -->
+  <!-- タブ3: 利用規約 -->
   <div class="tab-content">
     <h2>利用規約</h2>
     <p>当サイトでは個人情報の保護などを特に重要視しております。</p>
     <h3>第一条/プライバシーの保護</h3>
-    <p>ユーザーの情報は適切に管理し、無断で第三者に提供することはありません。</p>
-    <p>詳細は以下の通りです。</p>
     <ul>
-      <li>収集する情報の種類</p>
-        収集する情報の種類は、お名前、メールアドレス、電話番号、のみです。</li>
-  <li><p>情報の利用目的</p>
-    情報は決して悪質な物に使われるものではありません。情報の利用目的は、こちら側のお客様の名義確認などです。
-  </li>
-  <li><p>情報の保管と管理</p>
-    情報の保管と管理に関しては、こちらで情報を厳重に保管、または管理させていただきます。情報が保存されている可能性（悪質利用するためではありません）がありますのでご了承ください。
-  </li>
-  <li><p>ユーザーの権利</p>
-    ユーザーの権利に関してはユーザーはエンタメのサイトを見るだけにとどめてください
-  </li>
+      <li>収集する情報の種類：お名前、メールアドレス、電話番号のみです。</li>
+      <li>情報の利用目的：名義確認など。</li>
+      <li>情報の保管と管理：厳重に保管しています。</li>
+      <li>ユーザーの権利：閲覧のみにとどめてください。</li>
     </ul>
-  <h3>第二条/データの保存と管理</h3>
-  <li>データに関して</p>
-    データとは、このサイト上のデータを表します
-      <li>保存と管理</p>
-    データはこちらで保存、管理しています。データが誤って消失しないように全力を尽くしておりますが、万が一データが消失した場合は「entame@eripo.net」にご連絡ください。
-  </li>
+    <h3>第二条/データの保存と管理</h3>
+    <ul>
+      <li>データとは、このサイト上の情報です。</li>
+      <li>保存と管理：万が一消失時は「entame@eripo.net」へ。</li>
+    </ul>
+  </div>
+
+  <!-- タブ4: お問い合わせ -->
+  <div class="tab-content">
+    <h2>📨 お問い合わせ</h2>
+    <input type="text" id="contactName" placeholder="お名前">
+    <input type="email" id="contactEmail" placeholder="メールアドレス">
+    <textarea id="contactMessage" placeholder="お問い合わせ内容" rows="4"></textarea>
+    <button onclick="submitContact()">送信</button>
+    <p id="contactResult" style="color:green;"></p>
+  </div>
+
+  <!-- タブ5: お問い合わせ確認（管理者用） -->
+  <div class="tab-content">
+    <h2>📋 お問い合わせ確認</h2>
+    <div id="contactList"></div>
   </div>
 
   <script>
@@ -125,6 +133,8 @@
         btn.classList.toggle('active', i === index);
         tabContents[i].classList.toggle('active', i === index);
       });
+      // 管理者タブ確認時に内容を更新
+      if (index === 5) loadContacts();
     }
 
     function login() {
@@ -135,6 +145,7 @@
       const adminContent = document.getElementById("adminContent");
       const adminMessage = document.getElementById("adminMessage");
       const tab3Button = document.getElementById("tab3Button");
+      const contactCheckTab = document.getElementById("contactCheckTab");
 
       error.textContent = "";
 
@@ -150,8 +161,9 @@
         loginForm.style.display = "none";
         adminContent.style.display = "block";
         adminMessage.textContent = `ようこそ、${id}さん（管理者）！`;
-        tab3Button.style.display = "inline-block"; // 管理者タブ表示
-        showTab(1); // ログインタブにとどめるか、必要なら切り替え
+        tab3Button.style.display = "inline-block";
+        contactCheckTab.style.display = "inline-block";
+        showTab(1);
       } else {
         error.textContent = "IDまたはパスワードが正しくありません。";
       }
@@ -161,18 +173,60 @@
       localStorage.removeItem("loggedInUser");
       document.getElementById("loginForm").style.display = "block";
       document.getElementById("adminContent").style.display = "none";
-      document.getElementById("tab3Button").style.display = "none"; // 管理者タブ非表示
-      showTab(0); // ホームタブに戻す
+      document.getElementById("tab3Button").style.display = "none";
+      document.getElementById("contactCheckTab").style.display = "none";
+      showTab(0);
     }
 
-    // 自動ログインチェック
+    function submitContact() {
+      const name = document.getElementById("contactName").value.trim();
+      const email = document.getElementById("contactEmail").value.trim();
+      const message = document.getElementById("contactMessage").value.trim();
+      const result = document.getElementById("contactResult");
+
+      if (!name || !email || !message) {
+        result.style.color = "red";
+        result.textContent = "すべての項目を入力してください。";
+        return;
+      }
+
+      const contacts = JSON.parse(localStorage.getItem("contacts") || "[]");
+      contacts.push({ name, email, message, date: new Date().toLocaleString() });
+      localStorage.setItem("contacts", JSON.stringify(contacts));
+      result.style.color = "green";
+      result.textContent = "送信されました！ありがとうございます。";
+
+      // フォームリセット
+      document.getElementById("contactName").value = "";
+      document.getElementById("contactEmail").value = "";
+      document.getElementById("contactMessage").value = "";
+    }
+
+    function loadContacts() {
+      const container = document.getElementById("contactList");
+      const contacts = JSON.parse(localStorage.getItem("contacts") || "[]");
+      if (contacts.length === 0) {
+        container.innerHTML = "<p>お問い合わせはまだありません。</p>";
+        return;
+      }
+      container.innerHTML = contacts.map(c => `
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+          <strong>日時：</strong>${c.date}<br>
+          <strong>名前：</strong>${c.name}<br>
+          <strong>メール：</strong>${c.email}<br>
+          <strong>内容：</strong><br>${c.message}
+        </div>
+      `).join("");
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const loggedIn = localStorage.getItem("loggedInUser");
       if (loggedIn) {
         document.getElementById("loginForm").style.display = "none";
         document.getElementById("adminContent").style.display = "block";
         document.getElementById("adminMessage").textContent = `ようこそ、${loggedIn}さん（管理者）！`;
-        document.getElementById("tab3Button").style.display = "inline-block"; // 管理者タブ表示
+        document.getElementById("tab3Button").style.display = "inline-block";
+        document.getElementById("contactCheckTab").style.display = "inline-block";
       }
     });
   </script>
