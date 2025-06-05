@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>エンタメ 公式サイト</title>
   <style>
     .tabs {
       display: flex;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      margin-bottom: 10px;
     }
     .tab-button {
       padding: 10px 20px;
@@ -88,18 +88,18 @@
   <!-- タブ3: 利用規約 -->
   <div class="tab-content">
     <h2>利用規約</h2>
-    <p>当サイトでは個人情報の保護などを特に重要視しております。</p>
-    <h3>第一条/プライバシーの保護</h3>
+    <p>当サイトでは、ユーザーのプライバシーと個人情報の保護を最も重要視しております。</p>
+    <h3>第1条 プライバシーの保護</h3>
     <ul>
-      <li>収集する情報の種類：お名前、メールアドレス、電話番号のみです。</li>
-      <li>情報の利用目的：名義確認など。</li>
-      <li>情報の保管と管理：厳重に保管しています。</li>
-      <li>ユーザーの権利：閲覧のみにとどめてください。</li>
+      <li><strong>収集する情報の種類：</strong>お名前、メールアドレス、電話番号など。</li>
+      <li><strong>情報の利用目的：</strong>本人確認や連絡手段として使用されます。</li>
+      <li><strong>情報の保管と管理：</strong>適切な方法で保管され、第三者に提供されることはありません。</li>
+      <li><strong>ユーザーの権利：</strong>ユーザーは自身の情報について確認・修正・削除を請求する権利を有します。</li>
     </ul>
-    <h3>第二条/データの保存と管理</h3>
+    <h3>第2条 データの保存と管理</h3>
     <ul>
-      <li>データとは、このサイト上の情報です。</li>
-      <li>保存と管理：万が一消失時は「entame@eripo.net」へ。</li>
+      <li>サイト上のデータ（投稿、コメントなど）は、システム上に保存されます。</li>
+      <li>データ消失や不具合が発生した場合は「entame@eripo.net」へお問い合わせください。</li>
     </ul>
   </div>
 
@@ -113,7 +113,7 @@
     <p id="contactResult" style="color:green;"></p>
   </div>
 
-  <!-- タブ5: お問い合わせ確認（管理者用） -->
+  <!-- タブ5: お問い合わせ確認 -->
   <div class="tab-content">
     <h2>📋 お問い合わせ確認</h2>
     <div id="contactList"></div>
@@ -133,7 +133,6 @@
         btn.classList.toggle('active', i === index);
         tabContents[i].classList.toggle('active', i === index);
       });
-      // 管理者タブ確認時に内容を更新
       if (index === 5) loadContacts();
     }
 
@@ -190,13 +189,12 @@
         return;
       }
 
-      const contacts = JSON.parse(localStorage.getItem("contacts") || "[]");
+      let contacts = JSON.parse(localStorage.getItem("contacts")) || [];
       contacts.push({ name, email, message, date: new Date().toLocaleString() });
       localStorage.setItem("contacts", JSON.stringify(contacts));
+
       result.style.color = "green";
       result.textContent = "送信されました！ありがとうございます。";
-
-      // フォームリセット
       document.getElementById("contactName").value = "";
       document.getElementById("contactEmail").value = "";
       document.getElementById("contactMessage").value = "";
@@ -204,7 +202,7 @@
 
     function loadContacts() {
       const container = document.getElementById("contactList");
-      const contacts = JSON.parse(localStorage.getItem("contacts") || "[]");
+      const contacts = JSON.parse(localStorage.getItem("contacts")) || [];
       if (contacts.length === 0) {
         container.innerHTML = "<p>お問い合わせはまだありません。</p>";
         return;
