@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>タブ切り替え＋管理者専用タブ</title>
+  <style>
+    .tabs {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .tab-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #eee;
+      border: none;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-button.active {
+      background-color: #fff;
+      border-bottom: 2px solid #3498db;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    input {
+      display: block;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tabs">
+    <button class="tab-button active" onclick="showTab(0)">ホーム🏠</button>
+    <button class="tab-button" onclick="showTab(1)">ログイン📁</button>
+    <button class="tab-button" id="tab3Button" onclick="showTab(2)" style="display:none;">管理者専用タブ🗂</button>
+  </div>
+
+  <!-- タブ1: ホーム -->
+  <div class="tab-content active">
+    <h1 style="color: Blue;">👦エンタメ👀</h1>
+    <h3>〜エンタメの公式サイトです〜</h3>
+    <p>エンタメは2025年に結成した、お笑い、マジックグループです。</p>
+    <p>エンタメの活動を暖かく見守ってください！</p>
+    <a href="#">最近の記事はこちら</a>
+    <p><small>© 2025 エンタメ®️</small></p>
+  </div>
+
+  <!-- タブ2: マイページ -->
+  <div class="tab-content" id="mypageTab">
+    <!-- ログインフォーム -->
+    <div id="loginForm">
+      <h2>🔐 ログイン</h2>
+      <input type="text" id="loginId" placeholder="ログインID">
+      <input type="password" id="loginPw" placeholder="パスワード（5文字以上）">
+      <button onclick="login()">ログイン</button>
+      <p id="loginError" style="color:red;"></p>
+    </div>
+
+    <!-- ログイン後表示 -->
+    <div id="adminContent" style="display:none;">
+      <h2>👑 管理者ページ</h2>
+      <p id="adminMessage"></p>
+      <button onclick="logout()">ログアウト</button>
+    </div>
+  </div>
+
+  <!-- タブ3 -->
+  <div class="tab-content">
+    <h2>🗂 管理者専用コンテンツ</h2>
+    <p>これは僕たち、ログインIDを持っている人だけが見れます！</p>
+    <h3>管理者専用日記</h3>
+    <p>2025.6.5今日はこのページの開設日です！</p>
+  </div>
+
+  <script>
+    const users = [
+      { id: "shiichan", password: "270626" },
+      { id: "isin", password: "isin123" },
+      { id: "gak", password: "gak123" }
+    ];
+
+    function showTab(index) {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabButtons.forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+        tabContents[i].classList.toggle('active', i === index);
+      });
+    }
+
+    function login() {
+      const id = document.getElementById("loginId").value.trim();
+      const pw = document.getElementById("loginPw").value.trim();
+      const error = document.getElementById("loginError");
+      const loginForm = document.getElementById("loginForm");
+      const adminContent = document.getElementById("adminContent");
+      const adminMessage = document.getElementById("adminMessage");
+      const tab3Button = document.getElementById("tab3Button");
+
+      error.textContent = "";
+
+      if (pw.length < 5) {
+        error.textContent = "パスワードは5文字以上です。";
+        return;
+      }
+
+      const user = users.find(u => u.id === id && u.password === pw);
+
+      if (user) {
+        localStorage.setItem("loggedInUser", id);
+        loginForm.style.display = "none";
+        adminContent.style.display = "block";
+        adminMessage.textContent = `ようこそ、${id}さん（管理者）！`;
+        tab3Button.style.display = "inline-block"; // タブ3表示
+      } else {
+        error.textContent = "IDまたはパスワードが正しくありません。";
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("adminContent").style.display = "none";
+      document.getElementById("tab3Button").style.display = "none"; // タブ3非表示
+    }
+
+    // 自動ログインチェック
+    window.addEventListener("DOMContentLoaded", () => {
+      const loggedIn = localStorage.getItem("loggedInUser");
+      if (loggedIn) {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("adminContent").style.display = "block";
+        document.getElementById("adminMessage").textContent = `ようこそ、${loggedIn}さん（管理者）！`;
+        document.getElementById("tab3Button").style.display = "inline-block"; // 管理者ならタブ3表示
+      }
+    });
+  </script>
+
+</body>
+</html>
